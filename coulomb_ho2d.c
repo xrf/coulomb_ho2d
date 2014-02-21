@@ -195,21 +195,21 @@ static NOINLINE int rfac_load(double **cache, uintf *max, uintf new_max) {
 
 /* Builds the cache for the functions up to the given maximums. */
 static int load_cache(struct clh2_cache *cache,
-                      size_t pow2_size,
-                      size_t rgamma2_size,
-                      size_t rfac_size) {
+                      size_t pow2_max,
+                      size_t rgamma2_max,
+                      size_t rfac_max) {
     /* pow2 */
-    if (cache->pow2_size < pow2_size &&
+    if (cache->pow2_size <= pow2_max &&
         register_cleanup() &&           /* only needs to be called here */
-        pow2_load(&cache->pow2, &cache->pow2_size, pow2_size))
+        pow2_load(&cache->pow2, &cache->pow2_size, pow2_max))
         return 1;
     /* rgamma2 */
-    if (cache->rgamma2_size < rgamma2_size &&
-        rgamma2_load(&cache->rgamma2, &cache->rgamma2_size, rgamma2_size))
+    if (cache->rgamma2_size <= rgamma2_max &&
+        rgamma2_load(&cache->rgamma2, &cache->rgamma2_size, rgamma2_max))
         return 1;
     /* rfac */
-    if (cache->rfac_size < rfac_size &&
-        rfac_load(&cache->rfac, &cache->rfac_size, rfac_size))
+    if (cache->rfac_size <= rfac_max &&
+        rfac_load(&cache->rfac, &cache->rfac_size, rfac_max))
         return 1;
     return 0;
 }
