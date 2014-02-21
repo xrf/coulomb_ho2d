@@ -76,6 +76,7 @@ static void warn(const char *format, ...) {
     va_start(args, format);
     fprintf(stderr, "coulomb_ho2d: ");
     vfprintf(stderr, format, args);
+    fflush(stderr);
     va_end(args);
 #endif
 }
@@ -155,43 +156,26 @@ static PURE double pow2(uintf n)    { return pow(sqrt(.5), n); }
 static PURE double rgamma2(uintf n) { return 1 / tgamma(.5 * n); }
 
 /* Calculates `1 / n!`. */
-static PURE double rfac(uintf n)     { return 1 / tgamma(n + 1); }
+static PURE double rfac(uintf n)    { return 1 / tgamma(n + 1); }
 
 /* Calculates `(-1) ^ n`. */
 static PURE int minuspow(uintf n)   { return n % 2 ? -1 : 1; }
 
-/* Builds the cache for the `pow2`. */
-static NOINLINE int pow2_load(double **cache, uintf *max, uintf new_max) {
-    size_t min_len = 2;
-    size_t new_len = new_max <= min_len ? min_len * 2 : new_max * 2;
-    if (resize_arrayd(cache, new_len))
-        return 1;
-    for (; *max != new_len; ++*max)
-        (*cache)[*max] = pow2(*max);
-    return 0;
-}
-
-/* Builds the cache for the `rgamma2`. */
-static NOINLINE int rgamma2_load(double **cache, uintf *max, uintf new_max) {
-    size_t min_len = 2;
-    size_t new_len = new_max <= min_len ? min_len * 2 : new_max * 2;
-    if (resize_arrayd(cache, new_len))
-        return 1;
-    for (; *max != new_len; ++*max)
-        (*cache)[*max] = rgamma2(*max);
-    return 0;
-}
-
-/* Builds the cache for the `rfac2`. */
-static NOINLINE int rfac_load(double **cache, uintf *max, uintf new_max) {
-    size_t min_len = 2;
-    size_t new_len = new_max <= min_len ? min_len * 2 : new_max * 2;
-    if (resize_arrayd(cache, new_len))
-        return 1;
-    for (; *max != new_len; ++*max)
-        (*cache)[*max] = rfac(*max);
-    return 0;
-}
+/* Builds the cache for the given function. */
+#define CACHE_LOADER(func)                                                  \
+    static NOINLINE                                                         \
+    int func ## _load(double **cache, uintf *size, uintf new_max) {         \
+        size_t minimum = 2;                                                 \
+        size_t new_size = (new_max <= minimum ? minimum : new_max) * 2;     \
+        if (resize_arrayd(cache, new_size))                                 \
+            return 1;                                                       \
+        for (; *size != new_size; ++*size)                                  \
+            (*cache)[*size] = func(*size);                                  \
+        return 0;                                                           \
+    }
+CACHE_LOADER(pow2)
+CACHE_LOADER(rgamma2)
+CACHE_LOADER(rfac)
 
 /* Builds the cache for the functions up to the given maximums. */
 static int load_cache(struct clh2_cache *cache,
@@ -215,9 +199,9 @@ static int load_cache(struct clh2_cache *cache,
 }
 
 /* Macros to make the code more readable. */
-#define rfac(x)     pure_at(cache->rfac, (x))
+#define rfac(x)     pure_at(cache->rfac,    (x))
 #define rgamma2(x)  pure_at(cache->rgamma2, (x))
-#define pow2(x)     pure_at(cache->pow2, (x))
+#define pow2(x)     pure_at(cache->pow2,    (x))
 
 /* Calculates the Coulomb matrix element. */
 static double calculate(struct clh2_cache *cache,
