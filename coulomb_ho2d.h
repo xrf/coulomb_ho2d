@@ -133,7 +133,7 @@ double coulomb_ho2d_r(struct clh2_cache *cache,
                `#coulomb_ho2d_r` or destroyed with `#clh2_cache_destroy`.
                On failure, `NULL` is returned.
  */
-struct clh2_cache *clh2_cache_create();
+struct clh2_cache *clh2_cache_create(void);
 
 /** Destroys the cache, releasing the memory used by it.
 

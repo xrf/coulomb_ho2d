@@ -132,12 +132,12 @@ static void free_cache(struct clh2_cache *cache) {
 }
 
 /* Cleans up the global cache. */
-static void global_cache_cleanup() {
+static void global_cache_cleanup(void) {
     free_cache(&global_cache);
 }
 
 /* Ensure the global cache is cleaned up before exit.  Always returns `1`. */
-static int register_cleanup() {
+static int register_cleanup(void) {
     if (!cleanup_registered) {
         atexit(&global_cache_cleanup);
         cleanup_registered = 1;
@@ -299,7 +299,7 @@ double coulomb_ho2d_r(struct clh2_cache *cache,
 }
 
 /* Allocates the cache and initializes it to zero. */
-struct clh2_cache *clh2_cache_create() {
+struct clh2_cache *clh2_cache_create(void) {
     struct clh2_cache *cache;
     cache = (struct clh2_cache *) calloc(1, sizeof(struct clh2_cache));
     if (!cache)
