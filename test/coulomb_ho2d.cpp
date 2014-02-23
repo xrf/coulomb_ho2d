@@ -2,7 +2,11 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
+#ifdef _WIN32
+#include <windows.h>
+#else
 #include <time.h>
+#endif
 #include <coulomb_ho2d.h>
 #ifndef NOREF
 #include "coulomb_ref.h"
@@ -10,13 +14,25 @@
 double coulomb_ref(...) { return NAN; }
 #endif
 
+#ifdef _MSC_VER
+static const double abserr = 1e-6;
+#else
 static const double abserr = 1e-7;
+#endif
 
 double tick() {
+#ifdef _WIN32
+    static LARGE_INTEGER freq;
+    LARGE_INTEGER counts;
+    if ((freq.QuadPart || QueryPerformanceFrequency(&freq))
+        && QueryPerformanceCounter(&counts))
+        return counts.QuadPart / (double) freq.QuadPart;
+#else
     timespec t;
-    if (clock_gettime(CLOCK_MONOTONIC, &t))
-        return 1 / 0.;
-    return t.tv_sec + t.tv_nsec * 1e-9;
+    if (!clock_gettime(CLOCK_MONOTONIC, &t))
+        return t.tv_sec + t.tv_nsec * 1e-9;
+#endif
+    return NAN;
 }
 
 template<class Func>
@@ -34,9 +50,13 @@ void loop(unsigned n_max, int ml_max, Func f) {
     }
 }
 
+unsigned calc_total(unsigned n_max, int ml_max) {
+    return static_cast<unsigned>(pow(n_max, 4.) * pow(2 * ml_max - 1, 3.));
+}
+
 template<class Func>
 void tloop(unsigned n_max, int ml_max, Func f) {
-    const unsigned num_total = pow(n_max, 4) * pow(2 * ml_max - 1, 3);
+    const unsigned num_total = calc_total(n_max, ml_max);
     unsigned num_done = 0;
     double init_time = tick();
     double prev = init_time;
@@ -87,7 +107,7 @@ double verify_case(unsigned n1, int ml1, unsigned n2, int ml2,
 }
 
 static void verify(unsigned n_max, int ml_max) {
-    const unsigned num_total = pow(n_max, 4) * pow(2 * ml_max - 1, 3);
+    const unsigned num_total = calc_total(n_max, ml_max);
     unsigned num_failed = 0;
     unsigned num_nonzero = 0;
     unsigned num_order3 = 0;
@@ -137,7 +157,7 @@ static void verify(unsigned n_max, int ml_max) {
 }
 
 static void profile(unsigned n_max, int ml_max, unsigned samples = 10) {
-    const unsigned num_total = pow(n_max, 4) * pow(2 * ml_max - 1, 3);
+    const unsigned num_total = calc_total(n_max, ml_max);
     unsigned max_samples = samples;
     double time_avg = 0;
     double time_m2 = 0;

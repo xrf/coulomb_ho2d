@@ -61,7 +61,7 @@ typedef
 #endif
       uintf;
 
-#ifndef __cplusplus
+#if !defined(__cplusplus) && defined(_MSC_VER)
 /* Declare the built-in `tgamma` in case it isn't declared already.  Avoid
    declaring this in C++ because those may contain an exception specifier. */
 double tgamma(double);
