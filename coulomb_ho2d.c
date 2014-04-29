@@ -22,7 +22,6 @@
 
  */
 #ifndef NDEBUG
-#include <assert.h>
 #include <stdarg.h>
 #include <stdio.h>
 #endif
