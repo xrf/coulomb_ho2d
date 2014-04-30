@@ -23,126 +23,130 @@
    DEALINGS IN THE SOFTWARE.
 
  */
-/** @file
+/** @mainpage Coulomb HO2D
 
-    Calculation of the Coulomb repulsion matrix elements in the basis of a
-    two-dimensional harmonic oscillator.
+    This code calculates the matrix elements of the Coulomb repulsion operator
+    in the basis of a two-dimensional harmonic oscillator (HO2D). @par
 
-    @mainpage Coulomb HO2D
+    For more information, see:
 
-    This code calculates the Coulomb repulsion matrix elements in the basis of
-    a two-dimensional harmonic oscillator.
-
-    ### Usage
-
-    To use the library, simply compile `coulomb_ho2d.c` and statically link it
-    with your program.  You can build a shared library too, but this may
-    reduce performance.  It is highly recommended that the code be compiled at
-    maximum optimization level.  Use unsafe floating-point optimizations
-    (e.g. `-ffast-math`) at your own discretion.
-
-    The API documentation can be found in `coulomb_ho2d.h`.
-
-    The code has been tested with GCC and Clang and has minimal dependencies.
-    It is written in comforming C99 / C++11 and uses the standard library.  No
-    external libraries are required, although you may need to explicitly link
-    to the standard math library.
-
-    It can also be compiled in C89 / C++03 provided that suitable replacements
-    for `tgamma` and `stdint.h` are supplied.  If `<stdint.h>` is not
-    available, define `NO_STDINT_H` instead (this may impact performance).
-
-    The precision of the results is less than `1e-7`.
-
-    @author     Analytic formula from paper by Anisimovas & Matulis (1998).
-    @author     Originally by Morten Hjorth-Jensen and Patrick Merlot (2013).
-    @author     Optimized by Fei Yuan (2014).
+      - [Main interface](group__main.html)
+      - [Legacy interface](group__compat.html)
 
     @copyright  MIT License.
 
-    @see        E. Anisimovas & A. Matulis (1998).
-                <i>J. Phys. Condens. Matter</i> <b>10</b> 601.
-                http://dx.doi.org/10.1088/0953-8984/10/3/013
+    @defgroup main  Main interface
+
+    Calculation of the Coulomb repulsion matrix elements in the
+    two-dimensional harmonic oscillator basis.
+
+    @{
 
  */
+#ifdef _WIN32
+# ifdef CLH2_BUILD
+#  define CLH2_EXTERN __declspec(dllexport)
+# else
+#  define CLH2_EXTERN __declspec(dllimport)
+# endif
+#else
+# define CLH2_EXTERN
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif
-struct clh2_cache;
+#ifndef CLH2_DOC
+# include "coulomb_ho2d_compat.h"
+#endif
 
-/** Calculates the Coulomb matrix element in a 2D harmonic oscillator basis.
+/** A context structure used for matrix element calculations.
 
-    Returns the matrix element:
+    The structure can be created with `#clh2_ctx_create`.  Once created, it
+    must be later destroyed with `#clh2_ctx_destroy`.
+
+ */
+typedef struct clh2_ctx clh2_ctx;
+
+/** Creates a context.
+
+    @return
+    If successful, a pointer to a valid context.  On failure, `NULL` is
+    returned.
+
+ */
+CLH2_EXTERN clh2_ctx *clh2_ctx_create(void);
+
+/** Destroys the context, releasing the memory used by it.
+
+    @param[in] ctx
+    Either a pointer to valid context or `NULL`.
+
+ */
+CLH2_EXTERN void clh2_ctx_destroy(clh2_ctx *ctx);
+
+/** Indices of a matrix element.
+
+    Here, `n` is the principal quantum number and `m` is to the angular
+    momentum projection.  In the form of a matrix element, the indices appear
+    in this order:
 
         <n1, ml1; n2, ml2 | V | n3, ml3; n4, ml4>
 
-    where `V` is the two-particle Coulomb repulsion operator.  The matrix
-    element is not antisymmetrized and does not consider spin.
-
-    An analytic expression is used to calculate the matrix element (see the
-    referenced paper by Anisimovas & Matulis).
-
-    @param n1, n2, n3, n4
-               The principal quantum numbers in the 2D harmonic oscillator
-               basis and can be any nonnegative number.
-
-    @param ml1, ml2, ml3, ml4
-               The angular momentum projection quantum number and can be any
-               integer.
-
-    @return    The value of the matrix element, or `NAN` if an error occurs.
-
-    @note      For "historical reasons", the last two index pairs are swapped
-               in the parameter list.
-
-    @warning   This function is not thread-safe as it uses a statically
-               allocated cache to speed up the calculations.  For
-               thread-safety, use `#coulomb_ho2d_r` instead.
+    where `V` is a two-particle operator.
 
  */
-double coulomb_ho2d(unsigned n1, int ml1, unsigned n2, int ml2,
-                    unsigned n4, int ml4, unsigned n3, int ml3);
+struct clh2_indices {
 
-/** Thread-safe version of `#coulomb_ho2d`.
+    /** The principal quantum number of the 1st particle. */
+    unsigned n1;
 
-    This function requires a thread-local cache to perform the calculations.
+    /** The principal quantum number of the 2nd particle. */
+    unsigned n2;
 
-    @param cache
-               Pointer to a cache created by `#clh2_cache_create`.
-               The cache shall remain valid after the invocation.
+    /** The principal quantum number of the 3rd particle. */
+    unsigned n3;
 
-    @param n1, n2, n3, n4, ml1, ml2, ml3, ml4
-               The quantum numbers as described in the documentation of
-               `#coulomb_ho2d`.
+    /** The principal quantum number of the 4th particle. */
+    unsigned n4;
 
-    @return    The value of the matrix element, or `NAN` if `cache` is `NULL`
-               or an error occurs during the calculation.
+    /** The angular momentum projection of the 1st particle. */
+    int ml1;
 
-    @warning   Invoking this function on multiple threads with a shared cache
-               will result in undefined behavior.
+    /** The angular momentum projection of the 2nd particle. */
+    int ml2;
 
-    @see `#coulomb_ho2d`
+    /** The angular momentum projection of the 3rd particle. */
+    int ml3;
+
+    /** The angular momentum projection of the 4th particle. */
+    int ml4;
+
+};
+
+/** Calculates the Coulomb matrix element in a 2D harmonic oscillator basis.
+
+    Returns the matrix element of a two-particle Coulomb repulsion operator.
+    The matrix element is not antisymmetrized and does not consider spin.
+
+    @param[in] ctx
+    Pointer to a valid context object.  It shall remain valid after the
+    invocation of this function regardless of whether an error occurs.
+    Must not be `NULL`.
+
+    @param[in] ix
+    Pointer to a structure containing indices that label the matrix element.
+    Must not be `NULL`.
+
+    @return
+    The value of the matrix element, or `NAN` if an error occurs.
+
+    @warning
+    The context must not be shared between threads.
+
  */
-double coulomb_ho2d_r(struct clh2_cache *cache,
-                      unsigned n1, int ml1, unsigned n2, int ml2,
-                      unsigned n4, int ml4, unsigned n3, int ml3);
+CLH2_EXTERN double clh2_element(clh2_ctx *ctx, const struct clh2_indices *ix);
 
-/** Creates a cache that can be used by `coulomb_ho2d_r`.
-
-    @return    If successful, a pointer to a cache that can be used with
-               `#coulomb_ho2d_r` or destroyed with `#clh2_cache_destroy`.
-               On failure, `NULL` is returned.
- */
-struct clh2_cache *clh2_cache_create(void);
-
-/** Destroys the cache, releasing the memory used by it.
-
-    @param cache
-               Either a cache previously created by `#clh2_cache_create`, or
-               `NULL`.
- */
-void clh2_cache_destroy(struct clh2_cache *cache);
-
+/** @} */
 #ifdef __cplusplus
 }
 #endif

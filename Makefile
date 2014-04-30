@@ -3,40 +3,62 @@ OUTDIR=$(BASEDIR)/dist/
 DOCDIR=$(OUTDIR)/doc/
 INTDIR=$(OUTDIR)/tmp
 ARFLAGS=-cru
-CFLAGS=-pedantic -Wall -std=c99 -O3 -ffast-math -DNDEBUG
+WARNFLAGS=-Wall -Wsign-conversion -pedantic
+CFLAGS=$(WARNFLAGS) -std=c99 -O3 -ffast-math -DNDEBUG
 REMOTE=git@github-xrf:xrf/coulomb_ho2d.git
 
 lib: $(OUTDIR)/libcoulombho2d.a
 
 all: lib test
 
-$(OUTDIR)/libcoulombho2d.a: $(INTDIR)/coulomb_ho2d.o
+$(OUTDIR)/libcoulombho2d.a: \
+    $(INTDIR)/coulomb_ho2d_am.o \
+    $(INTDIR)/coulomb_ho2d_compat.o
 	mkdir -p $(OUTDIR)
 	$(AR) $(ARFLAGS) $(OUTDIR)/libcoulombho2d.a \
-	        $(INTDIR)/coulomb_ho2d.o
+	      $(INTDIR)/coulomb_ho2d_am.o \
+	      $(INTDIR)/coulomb_ho2d_compat.o
 
-$(INTDIR)/coulomb_ho2d.o: coulomb_ho2d.c
+$(INTDIR)/coulomb_ho2d_am.o: coulomb_ho2d_am.c
 	mkdir -p $(INTDIR)
-	$(CC) $(CFLAGS) -o $(INTDIR)/coulomb_ho2d.o -c coulomb_ho2d.c
+	$(CC) $(CFLAGS) -o $@ -c coulomb_ho2d_am.c
+
+$(INTDIR)/coulomb_ho2d_compat.o: coulomb_ho2d_compat.c
+	mkdir -p $(INTDIR)
+	$(CC) $(CFLAGS) -o $@ -c coulomb_ho2d_compat.c
 
 test:
 	cd test && make
 
 test-compilers:
-	gcc -Wall -pedantic -x c -c coulomb_ho2d.c
-	g++ -Wall -pedantic -x c -c coulomb_ho2d.c
-	g++ -Wall -pedantic -std=c89 -x c -c coulomb_ho2d.c
-	g++ -Wall -pedantic -std=c99 -x c -c coulomb_ho2d.c
-	g++ -Wall -pedantic -x c++ -c coulomb_ho2d.c
-	g++ -Wall -pedantic -std=c++03 -x c++ -c coulomb_ho2d.c
-	g++ -Wall -pedantic -std=c++11 -x c++ -c coulomb_ho2d.c
-	clang -Wall -pedantic -x c -c coulomb_ho2d.c
-	clang++ -Wall -pedantic -x c -c coulomb_ho2d.c
-	clang++ -Wall -pedantic -std=c89 -x c -c coulomb_ho2d.c
-	clang++ -Wall -pedantic -std=c99 -x c -c coulomb_ho2d.c
-	clang++ -Wall -pedantic -x c++ -c coulomb_ho2d.c
-	clang++ -Wall -pedantic -std=c++03 -x c++ -c coulomb_ho2d.c
-	clang++ -Wall -pedantic -std=c++11 -x c++ -c coulomb_ho2d.c
+	gcc $(WARNFLAGS) -x c -c coulomb_ho2d_am.c
+	g++ $(WARNFLAGS) -x c -c coulomb_ho2d_am.c
+	g++ $(WARNFLAGS) -std=c89 -x c -c coulomb_ho2d_am.c
+	g++ $(WARNFLAGS) -std=c99 -x c -c coulomb_ho2d_am.c
+	g++ $(WARNFLAGS) -x c++ -c coulomb_ho2d_am.c
+	g++ $(WARNFLAGS) -std=c++03 -x c++ -c coulomb_ho2d_am.c
+	g++ $(WARNFLAGS) -std=c++11 -x c++ -c coulomb_ho2d_am.c
+	clang $(WARNFLAGS) -x c -c coulomb_ho2d_am.c
+	clang++ $(WARNFLAGS) -x c -c coulomb_ho2d_am.c
+	clang++ $(WARNFLAGS) -std=c89 -x c -c coulomb_ho2d_am.c
+	clang++ $(WARNFLAGS) -std=c99 -x c -c coulomb_ho2d_am.c
+	clang++ $(WARNFLAGS) -x c++ -c coulomb_ho2d_am.c
+	clang++ $(WARNFLAGS) -std=c++03 -x c++ -c coulomb_ho2d_am.c
+	clang++ $(WARNFLAGS) -std=c++11 -x c++ -c coulomb_ho2d_am.c
+	gcc $(WARNFLAGS) -x c -c coulomb_ho2d_compat.c
+	g++ $(WARNFLAGS) -x c -c coulomb_ho2d_compat.c
+	g++ $(WARNFLAGS) -std=c89 -x c -c coulomb_ho2d_compat.c
+	g++ $(WARNFLAGS) -std=c99 -x c -c coulomb_ho2d_compat.c
+	g++ $(WARNFLAGS) -x c++ -c coulomb_ho2d_compat.c
+	g++ $(WARNFLAGS) -std=c++03 -x c++ -c coulomb_ho2d_compat.c
+	g++ $(WARNFLAGS) -std=c++11 -x c++ -c coulomb_ho2d_compat.c
+	clang $(WARNFLAGS) -x c -c coulomb_ho2d_compat.c
+	clang++ $(WARNFLAGS) -x c -c coulomb_ho2d_compat.c
+	clang++ $(WARNFLAGS) -std=c89 -x c -c coulomb_ho2d_compat.c
+	clang++ $(WARNFLAGS) -std=c99 -x c -c coulomb_ho2d_compat.c
+	clang++ $(WARNFLAGS) -x c++ -c coulomb_ho2d_compat.c
+	clang++ $(WARNFLAGS) -std=c++03 -x c++ -c coulomb_ho2d_compat.c
+	clang++ $(WARNFLAGS) -std=c++11 -x c++ -c coulomb_ho2d_compat.c
 
 doc: $(DOCDIR)/.git/config
 	doxygen
