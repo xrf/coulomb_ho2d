@@ -4,7 +4,7 @@ DOCDIR=$(OUTDIR)/doc/
 INTDIR=$(OUTDIR)/tmp
 ARFLAGS=-cru
 CFLAGS=-pedantic -Wall -std=c99 -O3 -ffast-math -DNDEBUG
-REMOTE=git@github-rufw:rufw/coulomb_ho2d.git
+REMOTE=git@github-xrf:xrf/coulomb_ho2d.git
 
 lib: $(OUTDIR)/libcoulombho2d.a
 

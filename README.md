@@ -18,4 +18,4 @@ the standard library (and the standard math library, of course).
 The API is documented in the [generated documentation][1], or you can just
 peek into the header file and read it from there.
 
-  [1]: http://rufw.github.io/coulomb_ho2d
+  [1]: http://xrf.github.io/coulomb_ho2d
