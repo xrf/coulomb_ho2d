@@ -1,9 +1,10 @@
 BASEDIR=..
 OUTDIR=$(BASEDIR)/dist/
 INTDIR=$(OUTDIR)/tmp
-CXXFLAGS=-pedantic -Wall -std=c++11 -O3 -ffast-math -I$(BASEDIR)
+CXXFLAGS=-pedantic -Wall -std=c++11 -ffast-math -O3 -I$(BASEDIR)
+LLAPACK=-llapack			# only needed for OpenFCI version
 LDFLAGS=-L$(INTDIR) -L$(OUTDIR)
-LIBS=-lm -lrt -lcoulombho2d
+LIBS=-lm -lrt -lcoulombho2d $(LLAPACK)
 
 # Reference code that is used to verify the matrix elements.
 REF=coulomb_ref.c

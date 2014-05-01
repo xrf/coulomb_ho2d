@@ -23,22 +23,12 @@
    DEALINGS IN THE SOFTWARE.
 
  */
-/** @mainpage Coulomb HO2D
-
-    This code calculates the matrix elements of the Coulomb repulsion operator
-    in the basis of a two-dimensional harmonic oscillator (HO2D). @par
-
-    For more information, see:
-
-      - [Main interface](group__main.html)
-      - [Legacy interface](group__compat.html)
-
-    @copyright  MIT License.
-
-    @defgroup main  Main interface
+/** @defgroup main  Main interface
 
     Calculation of the Coulomb repulsion matrix elements in the
     two-dimensional harmonic oscillator basis.
+
+    Header file: `<coulomb_ho2d.h>`
 
     @{
 
@@ -53,6 +43,7 @@
 # define CLH2_EXTERN
 #endif
 #ifdef __cplusplus
+#include <stdexcept>
 extern "C" {
 #endif
 #ifndef CLH2_DOC
@@ -100,26 +91,37 @@ struct clh2_indices {
     /** The principal quantum number of the 1st particle. */
     unsigned n1;
 
-    /** The principal quantum number of the 2nd particle. */
-    unsigned n2;
-
-    /** The principal quantum number of the 3rd particle. */
-    unsigned n3;
-
-    /** The principal quantum number of the 4th particle. */
-    unsigned n4;
-
     /** The angular momentum projection of the 1st particle. */
     int ml1;
+
+    /** The principal quantum number of the 2nd particle. */
+    unsigned n2;
 
     /** The angular momentum projection of the 2nd particle. */
     int ml2;
 
+    /** The principal quantum number of the 3rd particle. */
+    unsigned n3;
+
     /** The angular momentum projection of the 3rd particle. */
     int ml3;
 
+    /** The principal quantum number of the 4th particle. */
+    unsigned n4;
+
     /** The angular momentum projection of the 4th particle. */
     int ml4;
+
+#ifdef __cplusplus
+    /** Default constructor that leaves the object uninitialized. */
+    clh2_indices() {}
+
+    /** [C++] Constructs with the given indices. */
+    clh2_indices(unsigned n1, int ml1, unsigned n2, int ml2,
+                 unsigned n3, int ml3, unsigned n4, int ml4)
+        : n1(n1), ml1(ml1), n2(n2), ml2(ml2),
+          n3(n3), ml3(ml3), n4(n4), ml4(ml4) {}
+#endif
 
 };
 
@@ -146,8 +148,57 @@ struct clh2_indices {
  */
 CLH2_EXTERN double clh2_element(clh2_ctx *ctx, const struct clh2_indices *ix);
 
-/** @} */
 #ifdef __cplusplus
 }
+
+/** [C++] Main namespace. */
+namespace clh2 {
+
+/** [C++] Indices of a matrix element. */
+typedef struct clh2_indices indices;
+
+/** [C++] A context structure used for matrix element calculations.
+
+    @warning
+    The context must not be shared between threads.
+
+ */
+class ctx {
+    clh2_ctx *_ctx;
+public:
+
+    /** Creates a context.
+
+        On failure, `std::runtime_error` is thrown.
+
+    */
+    ctx() : _ctx(clh2_ctx_create()) {
+        if (!_ctx)
+            throw std::runtime_error("coulomb_ho2d: cannot create context");
+    }
+
+    /** Calculates the Coulomb matrix element in a 2D harmonic
+        oscillator basis.
+
+        Returns the matrix element of a two-particle Coulomb repulsion operator.
+        The matrix element is not antisymmetrized and does not consider spin.
+
+        @param[in] ix
+        Pointer to a structure containing indices that label the matrix element.
+        Must not be `NULL`.
+
+        @return
+        The value of the matrix element, or `NAN` if an error occurs.
+
+    */
+    double element(const indices &ix) { return clh2_element(_ctx, &ix); }
+
+    /** Destroys the context, releasing the memory used by it. */
+    ~ctx() { clh2_ctx_destroy(_ctx); }
+
+};
+
+}
 #endif
+/** @} */
 #endif

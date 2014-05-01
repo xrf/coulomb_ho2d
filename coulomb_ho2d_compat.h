@@ -6,6 +6,8 @@
 
     For backward compatibility only.
 
+    Header file: `<coulomb_ho2d.h>`
+
     @{ */
 
 struct clh2_cache;

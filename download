@@ -1,0 +1,11 @@
+#!/bin/sh
+if command >/dev/null 2>&1 -v curl
+then
+    curl -L   "$@"
+elif command >/dev/null 2>&1 -v wget
+then
+    wget -O - "$@"
+else
+    echo >&2 "either `curl` or `wget` must be installed"
+    exit 1
+fi
