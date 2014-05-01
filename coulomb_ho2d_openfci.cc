@@ -37,8 +37,8 @@ static int shell_index(unsigned n, int ml) {
 /* must have standard layout to ensure C compatibility */
 struct clh2_ctx {
 
-    /* must be at least 1 to ensure that `setup` terminates */
-    static const int initial_shell_index_cap = 1;
+    /* sentinel value */
+    static const int initial_shell_index_cap = -1;
 
     /* internal state used by OpenFCI */
     quantumdot::QdotInteraction q;
@@ -48,10 +48,14 @@ struct clh2_ctx {
 
     clh2_ctx() : shell_index_cap(initial_shell_index_cap) {}
 
-    /* not exception-safe */
+    /* can throw exceptions */
     void setup(int shell_index_max) {
         if (shell_index_cap >= shell_index_max)
             return;
+        if (shell_index_cap == initial_shell_index_cap) {
+            /* must begin at a positive integer */
+            shell_index_cap = 2;
+        }
         do {
             shell_index_cap *= 2;
         } while (shell_index_cap < shell_index_max);
@@ -61,7 +65,7 @@ struct clh2_ctx {
         q.buildInteractionComBlocks();
     }
 
-    /* must be exception-safe */
+    /* must never throw exceptions */
     double element(const struct clh2_indices *ix) {
         const int N1 = shell_index(ix->n1, ix->ml1);
         const int N2 = shell_index(ix->n2, ix->ml2);
@@ -75,13 +79,15 @@ struct clh2_ctx {
             const int sign = (ix->n1 + ix->n2 + ix->n3 + ix->n4) % 2 ? -1 : 1;
             return sign * q.singleElement(N1, ix->ml1, N2, ix->ml2,
                                           N3, ix->ml3, N4, ix->ml4);
-        } catch (...) {
-            /* no idea if the internal state of `q` would remain valid after
-               an error, so let's just start over */
-            q = quantumdot::QdotInteraction();
-            shell_index_cap = initial_shell_index_cap;
-            return NAN;
-        }
+        } catch (const std::exception& e) {
+            warn("exception: %s\n", e.what());
+        } catch (...) {}
+        /* no idea if the internal state of `q` would remain valid after an
+           error, so let's just start over; let's hope the assignment operator
+           doesn't throw */
+        q = quantumdot::QdotInteraction();
+        shell_index_cap = initial_shell_index_cap;
+        return NAN;
     }
 
 };
