@@ -87,10 +87,10 @@ $(INTDIR)/$(OPENFCI)/src/quantumdot/QdotInteraction.hpp: \
 # compile OpenFCI (only the parts that are needed)
 $(INTDIR)/libopenfci.a: $(INTDIR)/$(OPENFCI)/src/quantumdot/QdotInteraction.hpp
 	cp -f $(OPENFCI).mk $(INTDIR)/$(OPENFCI)/src/Makefile
-	cd $(INTDIR)/$(OPENFCI)/src && make
+	cd $(INTDIR)/$(OPENFCI)/src && $(MAKE)
 
 test:
-	cd test && make
+	cd test && $(MAKE)
 
 test-compilers:
 	cppcheck coulomb_ho2d_am.c
