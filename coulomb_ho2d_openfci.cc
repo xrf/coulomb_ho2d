@@ -59,8 +59,10 @@ struct clh2_ctx {
         do {
             shell_index_cap *= 2;
         } while (shell_index_cap < shell_index_max);
-        /* increase the shell index and rebuild the internal state;
-           presumably, doing this more than once is okay */
+        /* increase the shell index; note that we can't actually reuse the
+           internal state due to some weird bug in OpenFCI, so we have to
+           construct a new one */
+        q = quantumdot::QdotInteraction();
         q.setR(shell_index_cap);
         q.buildInteractionComBlocks();
     }

@@ -198,7 +198,17 @@ static void profile(unsigned n_max, int ml_max, unsigned samples = 10) {
     fflush(stdout);
 }
 
+// regression test for a bug that only occurs when called in a certain order,
+// apparently due to the reuse of the internal state, i.e.
+// `QdotInteraction clh2_ctx::q`
+void check_weird_bug() {
+    clh2::ctx cache;
+    cache.element(clh2_indices(0, 0, 1, 0, 0, 3, 0, -3));
+    cache.element(clh2_indices(0, 0, 1, 0, 2, 1, 2, -1));
+}
+
 int main() {
+    check_weird_bug();
     verify_case(1, -4, 4, 0, 2, 4, 4, -8);
     verify(4, 2);
     profile(2, 3, 40);
