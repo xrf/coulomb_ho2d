@@ -2,36 +2,48 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
-#ifdef _WIN32
-#include <windows.h>
-#else
+#include <memory>
+#include <stdexcept>
+#include <dlfcn.h>
 #include <time.h>
-#endif
 #include <coulomb_ho2d.h>
-#ifndef NOREF
-#include "coulomb_ref.h"
-#else
-double coulomb_ref(...) { return NAN; }
-#endif
 
-#ifdef _MSC_VER
 static const double abserr = 1e-6;
-#else
-static const double abserr = 1e-7;
-#endif
+
+double (*coulomb_ref)(unsigned, int, unsigned, int,
+                      unsigned, int, unsigned, int);
+
+double coulomb_nop(unsigned, int, unsigned, int,
+                   unsigned, int, unsigned, int) { return NAN; }
+
+class dl {
+    void *_handle;
+    dl(const dl &);
+    dl *operator=(const dl &);
+public:
+
+    dl(const char *file, int mode = RTLD_NOW | RTLD_LOCAL)
+        : _handle(dlopen(file, static_cast<int>(mode))) {
+        if (!_handle)
+            throw std::runtime_error("dl::dl failed");
+    }
+
+    ~dl() { dlclose(_handle); }
+
+    template<class T>
+    void sym(const char *name, T &symbol) {
+        void *s = dlsym(_handle, name);
+        if (!s)
+            throw std::runtime_error("dl::sym failed");
+        symbol = reinterpret_cast<T>(s);
+    }
+
+};
 
 double tick() {
-#ifdef _WIN32
-    static LARGE_INTEGER freq;
-    LARGE_INTEGER counts;
-    if ((freq.QuadPart || QueryPerformanceFrequency(&freq))
-        && QueryPerformanceCounter(&counts))
-        return counts.QuadPart / (double) freq.QuadPart;
-#else
     timespec t;
     if (!clock_gettime(CLOCK_MONOTONIC, &t))
         return t.tv_sec + t.tv_nsec * 1e-9;
-#endif
     return NAN;
 }
 
@@ -90,10 +102,10 @@ double verify_case(unsigned n1, int ml1, unsigned n2, int ml2,
                    unsigned n3, int ml3, unsigned n4, int ml4,
                    unsigned* fail_counter = 0) {
     double z = coulomb_ho2d(n1, ml1, n2, ml2, n4, ml4, n3, ml3);
-    double w = coulomb_ref(n1, ml1, n2, ml2, n4, ml4, n3, ml3);
+    double w = (*coulomb_ref)(n1, ml1, n2, ml2, n4, ml4, n3, ml3);
     if (!isfinite(z) || fabs(z - w) > abserr) {
         fprintf(stderr, "failed: <%d %d; %d %d | %d %d; %d %d> "
-                "= %f != %f\n", n1, ml1, n2, ml2, n3, ml3, n4, ml4, z, w);
+                "= %.7f != %.7f\n", n1, ml1, n2, ml2, n3, ml3, n4, ml4, z, w);
         fflush(stderr);
         if (fail_counter) {
             ++*fail_counter;
@@ -128,17 +140,17 @@ static void verify(unsigned n_max, int ml_max) {
         if (1e-5 <= z && z < 1e-4)
             ++num_order5;
           });
-#ifndef NOREF
-    if (num_failed) {
-        printf("*** FAILED ***:  %2.2f%% (%d)\n",
-               num_failed * 100. / num_total, num_failed);
-        exit(1);
+    if (coulomb_ref != &coulomb_nop) {
+        if (num_failed) {
+            printf("*** FAILED ***:  %2.2f%% (%d)\n",
+                   num_failed * 100. / num_total, num_failed);
+            exit(1);
+        } else {
+            printf("passed (ok).\n");
+        }
     } else {
-        printf("passed (ok).\n");
+        printf("note: no verification is done.\n");
     }
-#else
-    printf("note: no verification is done.\n");
-#endif
     printf(
         "----------------------------------------\n"
         "total:   %d\n"
@@ -208,6 +220,18 @@ void check_weird_bug() {
 }
 
 int main() {
+    std::unique_ptr<dl> ref_so_ptr;
+    coulomb_ref = &coulomb_nop;
+    try {
+        // note that `RTLD_DEEPBIND` is really important here: if not for this
+        // flag, the loader will instead find the symbol from `libcoulombho2d`
+        // rather than the reference library we want here
+        auto *ref_so = new dl("libcoulombho2d_ref.so",
+                              RTLD_NOW | RTLD_LOCAL | RTLD_DEEPBIND);
+        ref_so->sym("coulomb_ho2d", coulomb_ref);
+        ref_so_ptr.reset(ref_so);
+    } catch (...) { }
+
     check_weird_bug();
     verify_case(1, -4, 4, 0, 2, 4, 4, -8);
     verify(4, 2);
@@ -215,5 +239,6 @@ int main() {
     profile(3, 3, 10);
     profile(3, 6, 2);
     profile(4, 2, 2);
+
     return 0;
 }

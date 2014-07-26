@@ -1,22 +1,18 @@
 BASEDIR=..
-OUTDIR=$(BASEDIR)/dist/
+OUTDIR=$(BASEDIR)/dist
 INTDIR=$(OUTDIR)/tmp
 CXXFLAGS=-pedantic -Wall -std=c++11 -ffast-math -O3 -I$(BASEDIR)
-LLAPACK=-llapack			# only needed for OpenFCI version
+LLAPACK=-llapack                        # only needed for OpenFCI version
 LDFLAGS=-L$(INTDIR) -L$(OUTDIR)
-LIBS=-lm -lrt -lcoulombho2d $(LLAPACK)
+LIBS=-lm -lrt -ldl -lcoulombho2d $(LLAPACK)
 
-# Reference code that is used to verify the matrix elements.
-REF=coulomb_ref.c
+test: $(INTDIR)/test
+	LD_LIBRARY_PATH=../dist:"$$LD_LIBRARY_PATH" \
+	    $(INTDIR)/test | tee $(INTDIR)/test.log
 
-test: $(INTDIR)/coulomb_ho2d
-	$(INTDIR)/coulomb_ho2d | tee $(INTDIR)/coulomb_ho2d.log
-
-$(INTDIR)/coulomb_ho2d: $(OUTDIR)/libcoulombho2d.a coulomb_ho2d.cpp
-	[ -f $(REF) ] 	 						  \
-	  && $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $(INTDIR)/coulomb_ho2d      \
-	            $(REF)  coulomb_ho2d.cpp $(LIBS)  			  \
-	  || $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $(INTDIR)/coulomb_ho2d      \
-	            -DNOREF coulomb_ho2d.cpp $(LIBS)
+$(INTDIR)/test: $(OUTDIR)/libcoulombho2d.a coulomb_ho2d.cpp
+	mkdir -p $(INTDIR)
+	[ -f ../coulomb.mk ] && cd .. && $(MAKE) -f coulomb.mk so-ref || :
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ coulomb_ho2d.cpp $(LIBS)
 
 .PHONY: test
