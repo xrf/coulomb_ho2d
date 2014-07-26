@@ -165,6 +165,8 @@ typedef struct clh2_indices indices;
  */
 class ctx {
     clh2_ctx *_ctx;
+    ctx(const ctx &);
+    ctx &operator=(const ctx &);
 public:
 
     /** Creates a context.
