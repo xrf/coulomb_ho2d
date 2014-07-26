@@ -28,16 +28,29 @@ The library contains two implementations of the same interface:
 
 ## Building
 
-The library is expected to be built as a static library, although it should be
-possible to build it as a shared library as well.
+The library can be built as either a static library or a shared library.
 
-To build the `am` version, run `make lib-am` in the root directory.  This will
-build a static library in the `dist` directory named `libcoulombho2d_am.a`.
-Alternatively, run the `make use-am` command to build the same library but
+### Static library
+
+A static library can be built using `make lib-{IMPL}` where `{IMPL}` is either
+`am` or `openfci`.  The library will be placed in `dist` directory and named
+`libcoulombho2d_{IMPL}.a`.  Note that for the `openfci` implementation, the
+user is required to link against LAPACK and the C++ standard library
+(e.g. `-llapack -lstdc++`).
+
+Alternatively, run the `make use-{IMPL}` command to build the same library but
 instead named as `libcoulombho2d.a`.
 
-Similarly, for the `openfci` version, one can run `make lib-openfci` or `make
-use-openfci`.
+### Shared libary
+
+A shared library can be built using `make so-{IMPL}` where `{IMPL}` is either
+`am` or `openfci`.  The library will be placed in `dist` directory and named
+`libcoulombho2d_{IMPL}.so.{VERSION}` where `{VERSION}` is the version of the
+library.  Additionally, a symbolic link named `libcoulombho2d_{IMPL}.so` is
+created as an alias.
+
+The `make use-{IMPL}` command will create a symbolic link to the given
+implementation named `libcoulombho2d.so`.
 
 ## Example
 

@@ -1,7 +1,7 @@
 ARFLAGS=-cru
 INCLDIRS=-Imanybody -Iquantumdot
 INCLUDES=--include=stdlib.h --include=climits
-CXXFLAGS=$(INCLDIRS) $(INCLUDES) -O2
+CXXFLAGS=$(INCLDIRS) $(INCLUDES) -fPIC -O2
 
 all: ../../libopenfci.a
 

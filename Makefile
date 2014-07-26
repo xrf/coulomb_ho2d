@@ -1,10 +1,13 @@
+VERSION=1.2.3
 BASEDIR=.
 OUTDIR=$(BASEDIR)/dist/
 DOCDIR=$(OUTDIR)/doc/
 INTDIR=$(OUTDIR)/tmp
 ARFLAGS=-cru
 WARNFLAGS=-Wall -Wsign-conversion -pedantic
-ALLFLAGS=$(WARNFLAGS) -ffast-math -O3 -DNDEBUG
+OPTFLAGS=-ffast-math -O3 -DNDEBUG
+FPICFLAG=-fPIC
+ALLFLAGS=$(WARNFLAGS) $(OPTFLAGS) $(FPICFLAG)
 CFLAGS=$(ALLFLAGS) -std=c99
 CXXFLAGS=$(ALLFLAGS) -std=c++11 # TODO switch to c++03 later on
 REMOTE=git@github-xrf:xrf/coulomb_ho2d.git
@@ -25,19 +28,41 @@ all: lib-am lib-openfci test
 
 lib-am: $(OUTDIR)/libcoulombho2d_am.a
 
-use-am: $(OUTDIR)/libcoulombho2d_am.a
+use-am: \
+    $(OUTDIR)/libcoulombho2d_am.a \
+    $(OUTDIR)/libcoulombho2d_am.so
 	cp -f $(OUTDIR)/libcoulombho2d_am.a $(OUTDIR)/libcoulombho2d.a
+	ln -fs libcoulombho2d_am.so $(OUTDIR)/libcoulombho2d.so
+
+so-am: $(OUTDIR)/libcoulombho2d_am.so
 
 lib-openfci: $(OUTDIR)/libcoulombho2d_openfci.a
 
-use-openfci: $(OUTDIR)/libcoulombho2d_openfci.a
+use-openfci: \
+    $(OUTDIR)/libcoulombho2d_openfci.a \
+    $(OUTDIR)/libcoulombho2d_openfci.so
 	cp -f $(OUTDIR)/libcoulombho2d_openfci.a $(OUTDIR)/libcoulombho2d.a
+	ln -fs libcoulombho2d_openfci.so $(OUTDIR)/libcoulombho2d.so
+
+so-openfci: $(OUTDIR)/libcoulombho2d_openfci.so
 
 $(OUTDIR)/libcoulombho2d_am.a: \
     $(INTDIR)/coulomb_ho2d_am.o \
     $(INTDIR)/coulomb_ho2d_compat.o
 	mkdir -p $(OUTDIR)
 	$(AR) $(ARFLAGS) $@ \
+	      $(INTDIR)/coulomb_ho2d_am.o \
+	      $(INTDIR)/coulomb_ho2d_compat.o
+
+$(OUTDIR)/libcoulombho2d_am.so: \
+    $(OUTDIR)/libcoulombho2d_am.so.$(VERSION)
+	ln -fs libcoulombho2d_am.so.$(VERSION) $@
+
+$(OUTDIR)/libcoulombho2d_am.so.$(VERSION): \
+    $(INTDIR)/coulomb_ho2d_am.o \
+    $(INTDIR)/coulomb_ho2d_compat.o
+	mkdir -p $(OUTDIR)
+	$(CC) -shared -Wl,-soname,libcoulombho2d_am.so.$(VERSION) -o $@ \
 	      $(INTDIR)/coulomb_ho2d_am.o \
 	      $(INTDIR)/coulomb_ho2d_compat.o
 
@@ -52,6 +77,23 @@ $(OUTDIR)/libcoulombho2d_openfci.a: \
 	      $(INTDIR)/libopenfci/*.o \
 	      $(INTDIR)/coulomb_ho2d_openfci.o \
 	      $(INTDIR)/coulomb_ho2d_compat.o
+
+$(OUTDIR)/libcoulombho2d_openfci.so: \
+    $(OUTDIR)/libcoulombho2d_openfci.so.$(VERSION)
+	ln -fs libcoulombho2d_openfci.so.$(VERSION) $@
+
+$(OUTDIR)/libcoulombho2d_openfci.so.$(VERSION): \
+    $(INTDIR)/libopenfci.a \
+    $(INTDIR)/coulomb_ho2d_openfci.o \
+    $(INTDIR)/coulomb_ho2d_compat.o
+	mkdir -p $(OUTDIR)
+	mkdir -p $(INTDIR)/libopenfci
+	cd $(INTDIR)/libopenfci && $(AR) -x ../libopenfci.a
+	$(CC) -shared -Wl,-soname,libcoulombho2d_openfci.so.$(VERSION) -o $@ \
+	      $(INTDIR)/libopenfci/*.o \
+	      $(INTDIR)/coulomb_ho2d_openfci.o \
+	      $(INTDIR)/coulomb_ho2d_compat.o \
+	      -llapack -lstdc++
 
 $(INTDIR)/coulomb_ho2d_am.o: coulomb_ho2d_am.c
 	mkdir -p $(INTDIR)
