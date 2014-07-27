@@ -28,29 +28,57 @@ The library contains two implementations of the same interface:
 
 ## Building
 
-The library can be built as either a static library or a shared library.
+The library can be built as either a static library or a shared library.  By
+default (i.e. with `make` without any arguments), both are built.
+
+In this section, substitute <code><var>{IMPL}</var></code> with your chosen
+implementation: either `am` or `openfci`.
+
+To create symbolic links to your chosen implementation, namely
+
+  - `libcoulombho2d.a` and
+  - `libcoulombho2d.so`,
+
+run:
+
+<pre><code>make IMPL=<var>{IMPL}</var> alias</code></pre>
+
+If the macro <code>IMPL</code> is not given, it defaults to `openfci`.
 
 ### Static library
 
-A static library can be built using `make lib-{IMPL}` where `{IMPL}` is either
-`am` or `openfci`.  The library will be placed in `dist` directory and named
-`libcoulombho2d_{IMPL}.a`.  Note that for the `openfci` implementation, the
-user is required to link against LAPACK and the C++ standard library
-(e.g. `-llapack -lstdc++`).
+A static library can be built using:
 
-Alternatively, run the `make use-{IMPL}` command to build the same library but
-instead named as `libcoulombho2d.a`.
+<pre><code>make static-<var>{IMPL}</var></code></pre>
+
+This will create the following library in the `dist` directory:
+
+  - <code>libcoulombho2d_<var>{IMPL}</var>.a</code>
+
+Note that for the `openfci` implementation, the *user* of the library must
+additionally link against a LAPACK implementation as well as the C++ standard
+library (e.g. `-llapack -lstdc++`).
 
 ### Shared libary
 
-A shared library can be built using `make so-{IMPL}` where `{IMPL}` is either
-`am` or `openfci`.  The library will be placed in `dist` directory and named
-`libcoulombho2d_{IMPL}.so.{VERSION}` where `{VERSION}` is the version of the
-library.  Additionally, a symbolic link named `libcoulombho2d_{IMPL}.so` is
-created as an alias.
+A shared library can be built using:
 
-The `make use-{IMPL}` command will create a symbolic link to the given
-implementation named `libcoulombho2d.so`.
+<pre><code>make shared-<var>{IMPL}</var></code></pre>
+
+This will create the following libraries in the `dist` directory:
+
+  - <code>libcoulombho2d_<var>{IMPL}</var>.so.<var>VERSION</var></code>
+  - <code>libcoulombho2d_<var>{IMPL}</var>.so</code> (a symbolic link to the
+    above library)
+
+## Installation
+
+The library can be installed via:
+
+<pre><code>make DESTDIR=<var>{DESTDIR}</var> install</code></pre>
+
+Substitute <code><var>{DESTDIR}</var></code> with the destination directory.
+If the macro `DESTDIR` is not provided, it defaults to `/usr`.
 
 ## Example
 
@@ -58,7 +86,7 @@ The following code calculates a matrix element.  For efficiency, the context
 object `ctx` should be reused when performing multiple matrix element
 calculations (but only within a single thread).
 
-````c
+```c
 #include <stdio.h>
 #include <coulomb_ho2d.h>
 int main(void) {
@@ -85,7 +113,7 @@ int main(void) {
     clh2_ctx_destroy(ctx);
     return 0;
 }
-````
+```
 
 [1]: http://dx.doi.org/10.1088/0953-8984/10/3/013
 [2]: http://arxiv.org/abs/0810.2644

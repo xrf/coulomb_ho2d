@@ -1,15 +1,16 @@
-# Doxyfile 1.8.6
+# Doxyfile 1.8.7
 
 #---------------------------------------------------------------------------
 # Project related configuration options
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
-PROJECT_NAME           = Coulomb HO2D
+PROJECT_NAME           = CoulombHO2D
 PROJECT_NUMBER         =
 PROJECT_BRIEF          =
 PROJECT_LOGO           =
 OUTPUT_DIRECTORY       = dist/doc
 CREATE_SUBDIRS         = NO
+ALLOW_UNICODE_NAMES    = NO
 OUTPUT_LANGUAGE        = English
 BRIEF_MEMBER_DESC      = YES
 REPEAT_BRIEF           = YES
@@ -107,9 +108,13 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # Configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = . LICENSE.md mainpage.md notes.md
+INPUT                  = . \
+                         LICENSE.md \
+                         mainpage.md \
+                         notes.md
 INPUT_ENCODING         = UTF-8
-FILE_PATTERNS          = *.c *.h
+FILE_PATTERNS          = *.c \
+                         *.h
 RECURSIVE              = NO
 EXCLUDE                =
 EXCLUDE_SYMLINKS       = NO
@@ -136,8 +141,6 @@ REFERENCES_LINK_SOURCE = YES
 SOURCE_TOOLTIPS        = YES
 USE_HTAGS              = NO
 VERBATIM_HEADERS       = NO
-CLANG_ASSISTED_PARSING = NO
-CLANG_OPTIONS          =
 #---------------------------------------------------------------------------
 # Configuration options related to the alphabetical class index
 #---------------------------------------------------------------------------
@@ -236,14 +239,13 @@ RTF_EXTENSIONS_FILE    =
 GENERATE_MAN           = NO
 MAN_OUTPUT             = man
 MAN_EXTENSION          = .3
+MAN_SUBDIR             =
 MAN_LINKS              = NO
 #---------------------------------------------------------------------------
 # Configuration options related to the XML output
 #---------------------------------------------------------------------------
 GENERATE_XML           = NO
 XML_OUTPUT             = xml
-XML_SCHEMA             =
-XML_DTD                =
 XML_PROGRAMLISTING     = YES
 #---------------------------------------------------------------------------
 # Configuration options related to the DOCBOOK output
@@ -270,7 +272,9 @@ EXPAND_ONLY_PREDEF     = NO
 SEARCH_INCLUDES        = YES
 INCLUDE_PATH           =
 INCLUDE_FILE_PATTERNS  =
-PREDEFINED             = __cplusplus CLH2_DOC CLH2_EXTERN
+PREDEFINED             = __cplusplus \
+                         CLH2_DOC \
+                         CLH2_EXTERN
 EXPAND_AS_DEFINED      =
 SKIP_FUNCTION_MACROS   = YES
 #---------------------------------------------------------------------------
