@@ -78,7 +78,7 @@ The library can be installed via:
 <pre><code>make DESTDIR=<var>{DESTDIR}</var> install</code></pre>
 
 Substitute <code><var>{DESTDIR}</var></code> with the destination directory.
-If the macro `DESTDIR` is not provided, it defaults to `/usr`.
+If the macro `DESTDIR` is not provided, it defaults to `/usr/local`.
 
 ## Example
 
