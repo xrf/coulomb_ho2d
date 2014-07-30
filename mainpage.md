@@ -1,7 +1,34 @@
 # Coulomb HO2D {#mainpage}
 
-This code calculates the matrix elements of the Coulomb repulsion operator in
-the basis of a two-dimensional harmonic oscillator (HO2D).
+Calculation of Coulomb interaction matrix elements in the basis of a
+two-dimensional harmonic oscillator (HO2D).
+
+## Quick start
+
+Download and unpack the [latest release][7], then run:
+
+```sh
+make
+make install        # with sudo if needed
+```
+
+This will install the libaries to `/usr/local/lib` and the headers to
+`/usr/local/include`.  You can find an [example of how to use the library][8]
+in the source tree.
+
+## Mathematical details
+
+The code calculates the spatial part of the Coulomb interaction matrix
+element:
+
+![matrix element][9]
+
+Here, `φ[n, ml]` denotes the eigenfunction of a two-dimensional harmonic
+oscillator with principal quantum number `n` and angular momentum projection
+`ml`.  In polar coordinates, these functions may be defined in terms of the
+[associated Laguerre polynomials][11] `L`:
+
+![basis function][10]
 
 ## Implementations
 
@@ -79,41 +106,6 @@ The library can be installed via:
 Substitute <code><var>{DESTDIR}</var></code> with the destination directory.
 If the macro `DESTDIR` is not provided, it defaults to `/usr/local`.
 
-## Example
-
-The following code calculates a matrix element.  For efficiency, the context
-object `ctx` should be reused when performing multiple matrix element
-calculations (but only within a single thread).
-
-~~~c
-#include <stdio.h>
-#include <coulomb_ho2d.h>
-int main(void) {
-    struct clh2_indices ix;
-
-    /* create context */
-    clh2_ctx *ctx = clh2_ctx_create();
-    if (!ctx) return 1;
-
-    /* initialize indices */
-    ix.n1  =  0;
-    ix.ml1 = -1;
-    ix.n2  =  0;
-    ix.ml2 =  1;
-    ix.n3  =  0;
-    ix.ml3 = -2;
-    ix.n4  =  0;
-    ix.ml4 =  2;
-
-    /* calculate and print matrix element (expected result: 0.303537) */
-    printf("%f\n", clh2_element(ctx, &ix));
-
-    /* destroy context */
-    clh2_ctx_destroy(ctx);
-    return 0;
-}
-~~~
-
 ## API
 
 The library provides a C API.  For convenience, it also provides C++ interface
@@ -123,8 +115,15 @@ as header-only wrapper around the C API.  Both are contained in
   - [Main interface](group__main.html)
   - [Legacy interface](group__compat.html)
 
-[1]: http://dx.doi.org/10.1088/0953-8984/10/3/013
-[2]: http://arxiv.org/abs/0810.2644
-[3]: http://folk.uio.no/simenkva/openfci.shtml
-[4]: http://sourceforge.net/projects/lpp
-[5]: http://netlib.org/lapack
+[1]:  http://dx.doi.org/10.1088/0953-8984/10/3/013
+[2]:  http://arxiv.org/abs/0810.2644
+[3]:  http://folk.uio.no/simenkva/openfci.shtml
+[4]:  http://sourceforge.net/projects/lpp
+[5]:  http://netlib.org/lapack
+[11]: https://en.wikipedia.org/wiki/Laguerre_polynomials#Generalized_Laguerre_polynomials
+
+[6]:  http://xrf.github.io/coulomb_ho2d
+[7]:  https://github.com/xrf/coulomb_ho2d/releases
+[8]:  https://github.com/xrf/coulomb_ho2d/blob/master/example.c
+[9]:  https://github.com/xrf/coulomb_ho2d/raw/master/equation-matrix-element.png
+[10]: https://github.com/xrf/coulomb_ho2d/raw/master/equation-basis-function.png
