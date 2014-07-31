@@ -6,4 +6,4 @@ before_install:
   - sudo apt-get update -qq
 install:
   - sudo apt-get install -y liblapack-dev
-script: make && sudo make install
+script: make && make check && sudo make install

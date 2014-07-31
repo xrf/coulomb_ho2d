@@ -2,7 +2,7 @@
 BASEDIR=..
 OUTDIR=$(BASEDIR)/dist
 INTDIR=$(OUTDIR)/tmp
-CXXFLAGS=-pedantic -Wall -std=c++03 -ffast-math -O3 -I$(BASEDIR)
+CXXFLAGS=-pedantic -Wall -std=c++03 -O3 -I$(BASEDIR)
 # Lapack is only needed for OpenFCI version
 LLAPACK=-llapack
 LDFLAGS=-L$(INTDIR) -L$(OUTDIR)

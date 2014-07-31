@@ -210,6 +210,29 @@ void check_weird_bug() {
     cache.element(clh2_indices(0, 0, 1, 0, 2, 1, 2, -1));
 }
 
+void check_specific_case() {
+    static const double expected     = 0.303537;
+    static const double expected_err = 0.000001;
+    struct clh2_indices ix;
+    clh2::ctx cache;
+    ix.n1  =  0;
+    ix.ml1 = -1;
+    ix.n2  =  0;
+    ix.ml2 =  1;
+    ix.n3  =  0;
+    ix.ml3 = -2;
+    ix.n4  =  0;
+    ix.ml4 =  2;
+    double result = cache.element(ix);
+    // check if it's correct (and not NAN)
+    if (!(fabs(result - expected) < expected_err)) {
+        fprintf(stderr, "got %.6f, which doesn't match expected: %.6f\n",
+                result, expected);
+        throw std::runtime_error("check_specific_case: failed");
+    }
+    printf("check_specific_case: passed\n");
+}
+
 int main() {
     dl *ref_so = 0;
     coulomb_ref = &coulomb_nop;
@@ -222,6 +245,7 @@ int main() {
         ref_so->sym("coulomb_ho2d", coulomb_ref);
     } catch (...) { }
 
+    check_specific_case();
     check_weird_bug();
     verify_case(1, -4, 4, 0, 2, 4, 4, -8);
     verify(4, 2);
