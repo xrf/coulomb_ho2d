@@ -1,4 +1,7 @@
-# Coulomb HO2D [![Build status](https://travis-ci.org/xrf/coulomb_ho2d.svg?branch=master)](https://travis-ci.org/xrf/coulomb_ho2d)
+# Coulomb HO2D [![Build status][ci]][ca]
+
+[ca]: https://travis-ci.org/xrf/coulomb_ho2d
+[ci]: https://travis-ci.org/xrf/coulomb_ho2d.svg?branch=master
 
 Calculation of Coulomb interaction matrix elements in the basis of a
 two-dimensional harmonic oscillator (HO2D).  See the [full documentation][6]
