@@ -1,0 +1,9 @@
+language: cpp
+compiler:
+  - clang
+  - gcc
+before_install:
+  - sudo apt-get update -qq
+install:
+  - sudo apt-get install -y liblapack-dev
+script: make && sudo make install

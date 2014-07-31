@@ -11,7 +11,7 @@ OPTFLAGS=-ffast-math -O3 -DNDEBUG
 FPICFLAG=-fPIC
 ALLFLAGS=$(WARNFLAGS) $(OPTFLAGS) $(FPICFLAG)
 CFLAGS=$(ALLFLAGS) -std=c99
-CXXFLAGS=$(ALLFLAGS) -std=c++11 # TODO switch to c++03 later on
+CXXFLAGS=$(ALLFLAGS) -std=c++03
 REMOTE=git@github-xrf:xrf/coulomb_ho2d.git
 LLAPACK=-llapack
 
@@ -204,11 +204,14 @@ $(INTDIR)/coulomb_ho2d_am.o: coulomb_ho2d_am.c
 	mkdir -p $(INTDIR)
 	$(CC) $(CFLAGS) -o $@ -c coulomb_ho2d_am.c
 
+# the `__extern_always_inline` flag is a workaround for older versions of
+# Clang that don't like GCC's <math.h> when `-ffast-math` is enabled
 $(INTDIR)/coulomb_ho2d_openfci.o: \
     coulomb_ho2d_openfci.cc \
     $(INTDIR)/$(OPENFCI)/src/quantumdot/QdotInteraction.hpp
 	mkdir -p $(INTDIR)
 	$(CXX) $(CXXFLAGS) -o $@ \
+	       -D__extern_always_inline=inline \
 	       -I$(INTDIR)/$(OPENFCI)/src \
 	       -I$(INTDIR)/$(OPENFCI)/src/manybody \
 	       -Wno-sign-conversion -c coulomb_ho2d_openfci.cc
