@@ -1,7 +1,8 @@
 .POSIX:
 VERSION=1.2.3
 BASEDIR=.
-DESTDIR=/usr/local
+DESTDIR=
+PREFIX=/usr/local
 OUTDIR=$(BASEDIR)/dist
 DOCDIR=$(OUTDIR)/doc
 INTDIR=$(OUTDIR)/tmp
@@ -48,15 +49,15 @@ shared-am: $(OUTDIR)/libcoulombho2d_am.so
 shared-openfci: $(OUTDIR)/libcoulombho2d_openfci.so
 
 install: all
-	install -d $(DESTDIR)/include $(DESTDIR)/lib
-	install -m644 -t $(DESTDIR)/include \
+	install -d $(DESTDIR)$(PREFIX)/include $(DESTDIR)$(PREFIX)/lib
+	install -m644 -t $(DESTDIR)$(PREFIX)/include \
 	    coulomb_ho2d.h \
 	    coulomb_ho2d_compat.h
-	install -m644 -t $(DESTDIR)/lib \
+	install -m644 -t $(DESTDIR)$(PREFIX)/lib \
 	    $(OUTDIR)/libcoulombho2d.a \
 	    $(OUTDIR)/libcoulombho2d_am.a \
 	    $(OUTDIR)/libcoulombho2d_openfci.a
-	install -m755 -t $(DESTDIR)/lib \
+	install -m755 -t $(DESTDIR)$(PREFIX)/lib \
 	    $(OUTDIR)/libcoulombho2d.so \
 	    $(OUTDIR)/libcoulombho2d_am.so \
 	    $(OUTDIR)/libcoulombho2d_am.so.$(VERSION) \
@@ -65,16 +66,16 @@ install: all
 
 uninstall:
 	rm -f \
-	    $(DESTDIR)/include/coulomb_ho2d.h \
-	    $(DESTDIR)/include/coulomb_ho2d_compat.h \
-	    $(DESTDIR)/lib/libcoulombho2d.a \
-	    $(DESTDIR)/lib/libcoulombho2d_am.a \
-	    $(DESTDIR)/lib/libcoulombho2d_openfci.a \
-	    $(DESTDIR)/lib/libcoulombho2d.so \
-	    $(DESTDIR)/lib/libcoulombho2d_am.so \
-	    $(DESTDIR)/lib/libcoulombho2d_am.so.$(VERSION) \
-	    $(DESTDIR)/lib/libcoulombho2d_openfci.so \
-	    $(DESTDIR)/lib/libcoulombho2d_openfci.so.$(VERSION)
+	    $(DESTDIR)$(PREFIX)/include/coulomb_ho2d.h \
+	    $(DESTDIR)$(PREFIX)/include/coulomb_ho2d_compat.h \
+	    $(DESTDIR)$(PREFIX)/lib/libcoulombho2d.a \
+	    $(DESTDIR)$(PREFIX)/lib/libcoulombho2d_am.a \
+	    $(DESTDIR)$(PREFIX)/lib/libcoulombho2d_openfci.a \
+	    $(DESTDIR)$(PREFIX)/lib/libcoulombho2d.so \
+	    $(DESTDIR)$(PREFIX)/lib/libcoulombho2d_am.so \
+	    $(DESTDIR)$(PREFIX)/lib/libcoulombho2d_am.so.$(VERSION) \
+	    $(DESTDIR)$(PREFIX)/lib/libcoulombho2d_openfci.so \
+	    $(DESTDIR)$(PREFIX)/lib/libcoulombho2d_openfci.so.$(VERSION)
 
 check:
 	cd test && $(MAKE)
