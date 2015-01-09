@@ -1,10 +1,10 @@
 #!/bin/sh
 if command >/dev/null 2>&1 -v curl
 then
-    curl -L   "$@"
+    curl -fsLS    "$@"
 elif command >/dev/null 2>&1 -v wget
 then
-    wget -O - "$@"
+    wget -nv -O - "$@"
 else
     echo >&2 "either `curl` or `wget` must be installed"
     exit 1
