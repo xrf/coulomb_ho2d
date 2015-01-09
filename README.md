@@ -11,10 +11,8 @@ for details.
 
 Download and unpack the [latest release][7], then run:
 
-```sh
-make
-make install        # with sudo if needed
-```
+    make
+    make install        # with sudo if needed
 
 This will install the libaries to `/usr/local/lib` and the headers to
 `/usr/local/include`.  You can find an [example of how to use the library][8]
