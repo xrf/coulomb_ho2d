@@ -24,7 +24,7 @@ sha256sums=(SKIP)
 
 pkgver() {
     cd "$srcdir/$pkgname"
-    git describe --long --tags | sed s/^v// | sed -r 's/([^-]*-g)/r\1/;s/-/./g'
+    git describe --long --tags | sed s/^v// | sed 's/\([^-]*-\)g/r\1/;s/-/./g'
 }
 
 build() {
@@ -34,6 +34,6 @@ build() {
 
 package() {
     cd "$srcdir/$pkgname"
-    make DESTDIR="$pkgdir/usr" install
+    make DESTDIR="$pkgdir" PREFIX=/usr install
     install -Dm644 LICENSE.md "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
