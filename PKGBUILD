@@ -1,25 +1,14 @@
-# -*- shell-script -*-
 # Maintainer: Fei Yuan <yuan@nscl.msu.edu>
-pkgname=coulombho2d-git
+pkgname=clh2-git
 pkgver=latest
 pkgrel=1
 pkgdesc="Coulomb matrix elements in 2D harmonic oscillator basis"
 arch=(i686 x86_64)
-url="https://github.com/xrf/coulomb_ho2d"
+url=https://github.com/xrf/coulomb_ho2d
 license=(MIT)
-groups=()
-depends=(glibc lapack)
+depends=(lapack)
 makedepends=(git)
-optdepends=()
-provides=()
-conflicts=()
-replaces=()
-backup=()
-options=()
-install=
-changelog=
 source=($pkgname::git://github.com/xrf/coulomb_ho2d)
-noextract=()
 sha256sums=(SKIP)
 
 pkgver() {
@@ -36,11 +25,11 @@ pkgver() {
 
 build() {
     cd "$srcdir/$pkgname"
-    make
+    make all
 }
 
 package() {
     cd "$srcdir/$pkgname"
     make DESTDIR="$pkgdir" PREFIX=/usr install
-    install -Dm644 LICENSE.md "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
