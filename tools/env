@@ -1,0 +1,5 @@
+#!/bin/sh
+# set up the environment variables needed for local testing
+PATH=dist/bin${PATH+:}$PATH
+LD_LIBRARY_PATH=dist/lib${LD_LIBRARY_PATH+:}$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH PATH

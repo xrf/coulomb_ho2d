@@ -1,43 +1,62 @@
-/* compile with `-lcoulomb_ho2d` and, if needed, set the `LD_LIBRARY_PATH`
-   environment variable appropriately */
+/*
+
+simple example program that demonstrates the library:
+
+  - when compiling be sure to specify `-lclh2`
+
+  - if you want to try out this program *before* installing the `clh2`
+    library, you can do so by running `make example`; otherwise, you will need
+    to manually add the `-L` linker flag and modify both `LD_LIBRARY_PATH` and
+    `PATH` accordingly
+
+*/
 #include <math.h>
 #include <stdio.h>
-#include "am.h"
-int main(void) {
-    static const double expected     = 0.303537;
-    static const double expected_err = 0.000001;
-    struct clh2_indices ix;
-    double result;
+#include <stdlib.h>
+#include <string.h>
 
-    /* create context; to be efficient, reuse the context as much as possible
-       (but only within the same thread) */
-    clh2_ctx *ctx = clh2_ctx_create();
-    if (!ctx) {
-        fprintf(stderr, "can't create context\n");
-        return 1;
-    }
+/* include the clh2 library header */
+#include <clh2.h>
+
+int main(void) {
+    static const double expected  = 0.303537;
+    static const double tolerance = 0.000001;
+    static const size_t count     = 1;
+    static const char  *provider  = NULL; /* use default provider */
+
+    const double *result;
+    double discrepancy;
+    int errnum;
 
     /* initialize indices */
-    ix.n1  =  0;
-    ix.ml1 = -1;
-    ix.n2  =  0;
-    ix.ml2 =  1;
-    ix.n3  =  0;
-    ix.ml3 = -2;
-    ix.n4  =  0;
-    ix.ml4 =  2;
+    struct clh2_indicesp indices;
+    indices.n1  =  0;
+    indices.ml1 = -1;
+    indices.n2  =  0;
+    indices.ml2 =  1;
+    indices.n3  =  0;
+    indices.ml3 = -2;
+    indices.n4  =  0;
+    indices.ml4 =  2;
 
-    /* calculate and print matrix element */
-    result = clh2_element(ctx, &ix);
-    printf("result: %.6f\n", result);
-
-    /* check if it's correct (and not NAN) */
-    if (!(fabs(result - expected) < expected_err)) {
-        fprintf(stderr, "doesn't match expected result: %.6f\n", expected);
-        return 2;
+    /* calculate a single matrix element */
+    errnum = clh2_request(&result, provider, count, &indices);
+    if (errnum) {
+        fprintf(stderr, "example: error: %s\n", strerror(errnum));
+        return EXIT_FAILURE;
     }
 
-    /* destroy context */
-    clh2_ctx_destroy(ctx);
-    return 0;
+    /* print the matrix element */
+    printf("matrix element = %.6f\n", *result);
+
+    /* check if the result is correct (and not NAN) */
+    discrepancy = fabs(*result - expected);
+    clh2_free(count, result);
+    if (!(discrepancy < tolerance)) {
+        fprintf(stderr, "example: doesn't match expected value: %.6f\n",
+                expected);
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
 }

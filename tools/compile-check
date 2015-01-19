@@ -1,0 +1,35 @@
+#!/bin/sh
+set -e
+
+check() {
+    cc=$1
+    cxx=$2
+
+    is_c=
+    case $input in
+        *.c) is_c=t;;
+    esac
+
+    if [ "$is_c" ]
+    then
+        "$cc"  $CPPFLAGS $warnflags -x c -o /dev/null -c "$input"
+        "$cxx" $CPPFLAGS $warnflags -x c -o /dev/null -c "$input"
+        "$cxx" $CPPFLAGS $warnflags -std=c89 -x c -o /dev/null -c "$input"
+        "$cxx" $CPPFLAGS $warnflags -std=c99 -x c -o /dev/null -c "$input"
+        "$cxx" $CPPFLAGS $warnflags -std=c11 -x c -o /dev/null -c "$input"
+    fi
+
+    "$cxx" $CPPFLAGS $warnflags -x c++ -o /dev/null -c "$input"
+    "$cxx" $CPPFLAGS $warnflags -std=c++03 -x c++ -o /dev/null -c "$input"
+    "$cxx" $CPPFLAGS $warnflags -std=c++11 -x c++ -o /dev/null -c "$input"
+    "$cxx" $CPPFLAGS $warnflags -std=c++14 -x c++ -o /dev/null -c "$input"
+}
+
+for input
+do
+
+    cppcheck "$input"
+    check gcc   g++
+    check clang clang++
+
+done

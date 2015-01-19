@@ -1,40 +1,21 @@
-/* The MIT License (MIT)
-
-   Copyright (c) 2014 Fei Yuan.
-
-   Permission is hereby granted, free of charge, to any person obtaining a
-   copy of this software and associated documentation files (the "Software"),
-   to deal in the Software without restriction, including without limitation
-   the rights to use, copy, modify, merge, publish, distribute, sublicense,
-   and/or sell copies of the Software, and to permit persons to whom the
-   Software is furnished to do so, subject to the following conditions:
-
-   The above copyright notice and this permission notice shall be included in
-   all copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-   DEALINGS IN THE SOFTWARE.
-
- */
 #include <limits.h>
+#include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
 #ifndef NO_STDINT_H
 # define __STDC_LIMIT_MACROS
 # include <stdint.h>
 #endif
 #include "am.h"
-#include "util.inl"
 #ifdef _MSC_VER
 #  define NOINLINE __declspec(noinline)
 #  define PURE
 #else
 #  define NOINLINE __attribute__((noinline))
 #  define PURE     __attribute__((pure))
+#endif
+#ifndef NAN
+# define NAN (0./0.)
 #endif
 #ifdef __cplusplus
 extern "C" {
@@ -96,16 +77,16 @@ struct clh2_ctx {
 static PURE double pure_at(const double *array, uintf n) { return array[n]; }
 
 /* Calculates `1 / 2^(n / 2)`. */
-static PURE double pow2(uintf n)    { return pow(sqrt(.5), n); }
+static PURE double pow2(uintf n)    { return pow(sqrt(.5), (double) n); }
 
 /* Calculates `1 / Γ[n / 2]`. */
-static PURE double rgamma2(uintf n) { return 1 / tgamma(.5 * n); }
+static PURE double rgamma2(uintf n) { return 1 / tgamma(.5 * (double) n); }
 
 /* Calculates `1 / n!`. */
-static PURE double rfac(uintf n)    { return 1 / tgamma(n + 1); }
+static PURE double rfac(uintf n)    { return 1 / tgamma((double) n + 1); }
 
 /* Calculates `(-1) ^ n`. */
-static PURE int minuspow(uintf n)   { return n % 2 ? -1 : 1; }
+static PURE int minuspow(uintf n)   { return (n % 2) ? -1 : 1; }
 
 /* Builds the cache for the given function. */
 #define CACHE_LOADER(func)                                                  \
@@ -146,8 +127,11 @@ static int load_caches(clh2_ctx *ctx,
 /* Allocates the context and initializes it to zero. */
 clh2_ctx *clh2_ctx_create(void) {
     clh2_ctx *ctx = (clh2_ctx *) calloc(1, sizeof(*ctx));
-    if (!ctx)
-        warn("can't allocate memory to create context\n");
+    if (!ctx) {
+        fprintf(stderr, "clh2_ctx_create: "
+                "can't allocate the memory needed to create context\n");
+        fflush(stderr);
+    }
     return ctx;
 }
 
@@ -199,7 +183,9 @@ double clh2_element(clh2_ctx *ctx, const struct clh2_indices *ix) {
        `rfac`, and then precompute them if not cached already */
     NM1 = N + M + 1;
     if (load_caches(ctx, N + NM1, 1 + N + NM1, 2 * NM1)) {
-        warn("can't allocate memory\n");
+        fprintf(stderr, "clh2_element: "
+                "can't allocate the memory needed for calculation\n");
+        fflush(stderr);
         return NAN;
     }
     /* calculate using the Anisimovas & Matulis formula */
