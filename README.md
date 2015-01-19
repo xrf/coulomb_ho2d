@@ -88,6 +88,6 @@ If the macro `DESTDIR` is not provided, it defaults to `/usr/local`.
 
 [6]:  http://xrf.github.io/coulomb_ho2d
 [7]:  https://github.com/xrf/coulomb_ho2d/releases
-[8]:  https://github.com/xrf/coulomb_ho2d/blob/master/example.c
+[8]:  https://github.com/xrf/coulomb_ho2d/blob/master/src/example.c
 [9]:  https://github.com/xrf/coulomb_ho2d/raw/master/equation-matrix-element.png
 [10]: https://github.com/xrf/coulomb_ho2d/raw/master/equation-basis-function.png

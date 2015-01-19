@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <coulomb_ho2d.h>
+#include "am.h"
 
 /* calculate the maximum `n` that lies within the required shells */
 unsigned n_max(unsigned num_shells, int ml) {

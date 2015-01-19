@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <dlfcn.h>
 #include <time.h>
-#include <coulomb_ho2d.h>
+#include "am.h"
 
 static const double abserr = 1e-6;
 

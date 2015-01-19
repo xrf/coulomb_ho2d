@@ -2,7 +2,7 @@
    environment variable appropriately */
 #include <math.h>
 #include <stdio.h>
-#include <coulomb_ho2d.h>
+#include "am.h"
 int main(void) {
     static const double expected     = 0.303537;
     static const double expected_err = 0.000001;

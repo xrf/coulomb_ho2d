@@ -108,7 +108,7 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # Configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = . \
+INPUT                  = include \
                          mainpage.md \
                          notes.md
 INPUT_ENCODING         = UTF-8

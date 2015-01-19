@@ -35,8 +35,7 @@ shared-am: $(OUTDIR)/libcoulombho2d_am.so
 
 install: all
 	install -d $(DESTDIR)$(PREFIX)/include $(DESTDIR)$(PREFIX)/lib
-	install -m644 -t $(DESTDIR)$(PREFIX)/include \
-	    coulomb_ho2d.h
+	install -m644 src/am.h $(DESTDIR)$(PREFIX)/include/coulomb_ho2d.h
 	install -m644 -t $(DESTDIR)$(PREFIX)/lib \
 	    $(OUTDIR)/libcoulombho2d.a \
 	    $(OUTDIR)/libcoulombho2d_am.a
@@ -55,24 +54,24 @@ uninstall:
 	    $(DESTDIR)$(PREFIX)/lib/libcoulombho2d_am.so.$(VERSION)
 
 check:
-	cd test && $(MAKE)
+	$(MAKE) -f check.mk
 
 check-compilers:
-	cppcheck coulomb_ho2d_am.c
-	gcc $(WARNFLAGS) -x c -c coulomb_ho2d_am.c
-	g++ $(WARNFLAGS) -x c -c coulomb_ho2d_am.c
-	g++ $(WARNFLAGS) -std=c89 -x c -c coulomb_ho2d_am.c
-	g++ $(WARNFLAGS) -std=c99 -x c -c coulomb_ho2d_am.c
-	g++ $(WARNFLAGS) -x c++ -c coulomb_ho2d_am.c
-	g++ $(WARNFLAGS) -std=c++03 -x c++ -c coulomb_ho2d_am.c
-	g++ $(WARNFLAGS) -std=c++11 -x c++ -c coulomb_ho2d_am.c
-	clang $(WARNFLAGS) -x c -c coulomb_ho2d_am.c
-	clang++ $(WARNFLAGS) -x c -c coulomb_ho2d_am.c
-	clang++ $(WARNFLAGS) -std=c89 -x c -c coulomb_ho2d_am.c
-	clang++ $(WARNFLAGS) -std=c99 -x c -c coulomb_ho2d_am.c
-	clang++ $(WARNFLAGS) -x c++ -c coulomb_ho2d_am.c
-	clang++ $(WARNFLAGS) -std=c++03 -x c++ -c coulomb_ho2d_am.c
-	clang++ $(WARNFLAGS) -std=c++11 -x c++ -c coulomb_ho2d_am.c
+	cppcheck src/am.c
+	gcc $(WARNFLAGS) -x c -c src/am.c
+	g++ $(WARNFLAGS) -x c -c src/am.c
+	g++ $(WARNFLAGS) -std=c89 -x c -c src/am.c
+	g++ $(WARNFLAGS) -std=c99 -x c -c src/am.c
+	g++ $(WARNFLAGS) -x c++ -c src/am.c
+	g++ $(WARNFLAGS) -std=c++03 -x c++ -c src/am.c
+	g++ $(WARNFLAGS) -std=c++11 -x c++ -c src/am.c
+	clang $(WARNFLAGS) -x c -c src/am.c
+	clang++ $(WARNFLAGS) -x c -c src/am.c
+	clang++ $(WARNFLAGS) -std=c89 -x c -c src/am.c
+	clang++ $(WARNFLAGS) -std=c99 -x c -c src/am.c
+	clang++ $(WARNFLAGS) -x c++ -c src/am.c
+	clang++ $(WARNFLAGS) -std=c++03 -x c++ -c src/am.c
+	clang++ $(WARNFLAGS) -std=c++11 -x c++ -c src/am.c
 	rm coulomb_ho2d_am.o
 
 clean:
@@ -119,6 +118,6 @@ $(OUTDIR)/libcoulombho2d_am.so.$(VERSION): \
 	$(CC) -shared -Wl,-soname,libcoulombho2d_am.so.$(VERSION) -o $@ \
 	      $(INTDIR)/coulomb_ho2d_am.o
 
-$(INTDIR)/coulomb_ho2d_am.o: coulomb_ho2d_am.c
+$(INTDIR)/coulomb_ho2d_am.o: src/am.c
 	mkdir -p $(INTDIR)
-	$(CC) $(CFLAGS) -o $@ -c coulomb_ho2d_am.c
+	$(CC) $(CFLAGS) -o $@ -c src/am.c

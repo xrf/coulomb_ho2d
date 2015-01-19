@@ -27,8 +27,8 @@
 # define __STDC_LIMIT_MACROS
 # include <stdint.h>
 #endif
-#include "coulomb_ho2d.h"
-#include "coulomb_ho2d_utils.inl"
+#include "am.h"
+#include "util.inl"
 #ifdef _MSC_VER
 #  define NOINLINE __declspec(noinline)
 #  define PURE
