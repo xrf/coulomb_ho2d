@@ -46,9 +46,6 @@
 #include <stdexcept>
 extern "C" {
 #endif
-#ifndef CLH2_DOC
-# include "coulomb_ho2d_compat.h"
-#endif
 
 /** A context structure used for matrix element calculations.
 
