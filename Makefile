@@ -49,12 +49,9 @@ doc-upload: doc
 	. tools/conf && doc_upload dist/doc
 
 install: all
-	install -d \
-	    $(DESTDIR)$(PREFIX)/bin \
-	    $(DESTDIR)$(PREFIX)/include \
-	    $(DESTDIR)$(PREFIX)/lib
-	install -m644 -t $(DESTDIR)$(PREFIX)/include include/clh2.h
-	install -m644 -t $(DESTDIR)$(PREFIX)/lib dist/lib/libclh2.a
+	install -Dm644 include/clh2.h $(DESTDIR)$(PREFIX)/include/clh2.h
+	install -Dm644 dist/lib/libclh2.a $(DESTDIR)$(PREFIX)/lib/libclh2.a
+	install -Dm755 dist/bin/clh2-am $(DESTDIR)$(PREFIX)/bin/clh2-am
 	install -m755 -t $(DESTDIR)$(PREFIX)/lib \
 	    dist/lib/libclh2.so.$(version)
 	cp -P \
