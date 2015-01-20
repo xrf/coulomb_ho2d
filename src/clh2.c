@@ -81,7 +81,7 @@ int clh2_request(const double **values, const char *provider,
 
     /* copy inputs (choose the fastest way) */
     if (cell_size == sizeof(*args)) {
-        (void) memcpy(data + 1, args, size);
+        (void) memcpy(data + 1, args, size - cell_size);
     } else {
         const struct clh2_indicesp *src = args;
         union clh2_cell *dest = data + 1;
