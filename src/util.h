@@ -195,7 +195,7 @@ int rf_copy_argv(char ***argv, const char *const *cargv);
 
     @param[out] status        Exit status, which is negative if the process
                               was killed by a signal.  Can be `NULL`.
-    @param[in] cargv          An argument vector.
+    @param[in] argv           An argument vector.
     @return                   `0` on success; `errno` on failure.
 
 */
