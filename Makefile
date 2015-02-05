@@ -42,11 +42,11 @@ tabulate: dist/bin/tabulate dist/bin/clh2-am
 	. tools/env && dist/bin/tabulate $(NUM_SHELLS) $(PROVIDER)
 
 doc:
-	. tools/conf && doc_init dist/doc
+	. tools/conf && doc_init dist/share/doc/clh2
 	doxygen
 
 doc-upload: doc
-	. tools/conf && doc_upload dist/doc
+	. tools/conf && doc_upload dist/share/doc/clh2
 
 install: all
 	install -Dm644 include/clh2.h $(DESTDIR)$(PREFIX)/include/clh2.h
