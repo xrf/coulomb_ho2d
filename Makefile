@@ -4,7 +4,7 @@
 PREFIX=/usr/local
 
 ARFLAGS=-cru
-CPPFLAGS=-include dist/tmp/config.h -Iinclude -DNDEBUG -D_XOPEN_SOURCE=500
+CPPFLAGS=-Iinclude -DNDEBUG -D_XOPEN_SOURCE=500
 CFLAGS=-fPIC -fvisibility=hidden -g -O3 -mtune=native\
        -Wall -Wconversion -pedantic -std=c99
 libmath=-lm
@@ -31,7 +31,7 @@ check: dist/tmp/check dist/bin/example dist/bin/tabulate dist/bin/clh2-am
 	    dist/tmp/check $(PROVIDER)
 
 check-compilers:
-	CPPFLAGS='$(CPPFLAGS)' \
+	CPPFLAGS='$(CPPFLAGS) -include dist/tmp/config.h' \
 	warnflags='-Wall -Wconversion -pedantic' \
 	tools/compile-check src/*.c
 
@@ -89,7 +89,7 @@ dist/bin/example: \
     include/clh2.h \
     dist/lib/libclh2.so
 	mkdir -p dist/bin
-	$(CC) $(CPPFLAGS) $(CFLAGS) -Ldist/lib -o $@ \
+	$(CC) $(CPPFLAGS) $(CFLAGS) -include dist/tmp/config.h -Ldist/lib -o $@ \
 	    src/example.c -lclh2
 
 dist/bin/tabulate: \
@@ -97,7 +97,7 @@ dist/bin/tabulate: \
     include/clh2.h \
     dist/lib/libclh2.so
 	mkdir -p dist/bin
-	$(CC) $(CPPFLAGS) $(CFLAGS) -Ldist/lib -o $@ \
+	$(CC) $(CPPFLAGS) $(CFLAGS) -include dist/tmp/config.h -Ldist/lib -o $@ \
 	    src/tabulate.c -lclh2
 
 dist/lib/libclh2.a: \
@@ -105,8 +105,8 @@ dist/lib/libclh2.a: \
     dist/tmp/util.o
 	mkdir -p dist/lib
 	$(AR) $(ARFLAGS) $@ \
-	      dist/tmp/clh2.o \
-	      dist/tmp/util.o
+	    dist/tmp/clh2.o \
+	    dist/tmp/util.o
 
 dist/lib/libclh2.so: \
     dist/lib/libclh2.so.$(major) \
@@ -121,25 +121,28 @@ dist/lib/libclh2.so.$(version): \
     dist/tmp/util.o
 	mkdir -p dist/lib
 	$(CC) -shared -Wl,-soname,libclh2.so.$(major) -o $@ \
-	      dist/tmp/clh2.o \
-	      dist/tmp/util.o $(libpthread)
+	    dist/tmp/clh2.o \
+	    dist/tmp/util.o $(libpthread)
 
 dist/tmp/check: src/check.c include/clh2.h dist/lib/libclh2.so
 	mkdir -p dist/tmp
-	$(CC) $(CPPFLAGS) $(CFLAGS) -Ldist/lib -o $@ src/check.c -lclh2
+	$(CC) $(CPPFLAGS) $(CFLAGS) -include dist/tmp/config.h -Ldist/lib \
+	    -o $@ src/check.c -lclh2
 
 dist/tmp/config.h: tools/conf
 	mkdir -p dist/tmp
-	rm -f $@
+	rm -f $@.tmp
 	. tools/conf && \
 	    cc() { $(CC) $(CPPFLAGS) $(CFLAGS) "$$@"; } && \
-	    detect_limits >>$@ signed off_t OFF sys/types.h
+	    detect_limits >>$@.tmp signed off_t OFF sys/types.h
+	mv -f $@.tmp $@
 
 dist/tmp/am.o: \
     src/am.c \
     src/am.h
 	mkdir -p dist/tmp
-	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ -c src/am.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -include dist/tmp/config.h \
+	    -o $@ -c src/am.c
 
 dist/tmp/clh2.o: \
     src/clh2.c \
@@ -148,8 +151,8 @@ dist/tmp/clh2.o: \
     src/protocol.h \
     include/clh2.h \
     dist/tmp/config.h
-	mkdir -p dist/tmp
-	$(CC) $(CPPFLAGS) $(CFLAGS) -DCLH2_BUILD -o $@ -c src/clh2.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -include dist/tmp/config.h -DCLH2_BUILD \
+	    -o $@ -c src/clh2.c
 
 dist/tmp/clh2-am.o: \
     src/clh2-am.c \
@@ -158,8 +161,8 @@ dist/tmp/clh2-am.o: \
     src/util.h \
     include/clh2.h \
     dist/tmp/config.h
-	mkdir -p dist/tmp
-	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ -c src/clh2-am.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -include dist/tmp/config.h \
+	    -o $@ -c src/clh2-am.c
 
 dist/tmp/protocol.o: \
     src/protocol.c \
@@ -167,13 +170,13 @@ dist/tmp/protocol.o: \
     src/util.h \
     include/clh2.h \
     dist/tmp/config.h
-	mkdir -p dist/tmp
-	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ -c src/protocol.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -include dist/tmp/config.h \
+	    -o $@ -c src/protocol.c
 
 dist/tmp/util.o: \
     src/util.c \
     src/util.h \
     src/math.inl \
     dist/tmp/config.h
-	mkdir -p dist/tmp
-	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ -c src/util.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -include dist/tmp/config.h \
+	    -o $@ -c src/util.c
