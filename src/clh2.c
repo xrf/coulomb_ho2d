@@ -31,6 +31,11 @@ int clh2_request(const double **values, const char *provider,
     if (!values || (count && !args))
         return EINVAL;
 
+    if (!count) {
+        *values = NULL;
+        return 0;
+    }
+
     if (provider)
         argv[0] = provider;
 
@@ -79,7 +84,7 @@ int clh2_request(const double **values, const char *provider,
     data = (union clh2_cell *) ptr;
     data->indices = clh2_magic_in;
 
-    /* copy inputs (choose the fastest way) */
+    /* copy inputs (choose the faster way) */
     if (cell_size == sizeof(*args)) {
         (void) memcpy(data + 1, args, size - cell_size);
     } else {
@@ -174,6 +179,7 @@ void clh2_free(size_t count, const double *values) {
     /* release the memory based on how it was allocated previously */
     if (cell_size == sizeof(*values)) {
         const size_t size = (count + 1) * sizeof(*values);
+        /* this handles `values == NULL` just fine */
         (void) rf_munmap((void *) values, size);
     } else {
         free((double *) values);
