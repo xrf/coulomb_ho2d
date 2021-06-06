@@ -44,8 +44,8 @@ easily by setting the `provider` argument when calling `clh2_request`.
 If you'd like, you can install a different provider: [clh2-openfci][co], which
 can be much faster and more accurate than the default provider.
 
-[ca]: https://travis-ci.org/xrf/coulomb_ho2d
-[ci]: https://travis-ci.org/xrf/coulomb_ho2d.svg?branch=master
+[ca]: https://github.com/xrf/coulomb_ho2d/actions/workflows/build.yml
+[ci]: https://github.com/xrf/coulomb_ho2d/actions/workflows/build.yml/badge.svg
 [dc]: https://xrf.github.io/coulomb_ho2d
 [rl]: https://github.com/xrf/coulomb_ho2d/releases
 [eg]: https://github.com/xrf/coulomb_ho2d/blob/master/src/example.c
